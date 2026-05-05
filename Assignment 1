@@ -1,0 +1,47 @@
+"""
+Tseganesh Chala
+Cmsc 111
+Spring 2026
+Assignment 1:
+"""
+
+import os
+import shutil
+import zipfile
+
+# Folder paths
+data_folder = "data"
+csv_folder = os.path.join(data_folder, "CSV_Files")
+zip_name = "data_backup.zip"
+
+# Create CSV_Files folder if it does not exist
+os.makedirs(csv_folder, exist_ok=True)
+
+# Find all CSV files inside data/ but not inside CSV_Files
+csv_files = [
+    file for file in os.listdir(data_folder)
+    if file.endswith(".csv") and os.path.isfile(os.path.join(data_folder, file))
+]
+
+print(f"Found {len(csv_files)} CSV files.")
+
+# Move CSV files to data/CSV_Files/
+moved_count = 0
+
+for file in csv_files:
+    source = os.path.join(data_folder, file)
+    destination = os.path.join(csv_folder, file)
+
+    shutil.move(source, destination)
+    moved_count += 1
+
+print(f"Moved {moved_count} CSV files to data/CSV_Files.")
+
+# Create ZIP archive in root folder
+with zipfile.ZipFile(zip_name, "w") as zip_file:
+    for file in os.listdir(csv_folder):
+        if file.endswith(".csv"):
+            file_path = os.path.join(csv_folder, file)
+            zip_file.write(file_path, arcname=file)
+
+print(f"Created archive: {zip_name}")

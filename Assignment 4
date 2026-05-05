@@ -1,0 +1,54 @@
+"""
+Tseganesh Chala
+Cmsc 111
+Spring 2026
+Assignment 4:
+"""
+
+import requests
+from bs4 import BeautifulSoup
+
+LOGIN_URL = "https://the-internet.herokuapp.com/login"
+POST_URL = "https://the-internet.herokuapp.com/authenticate"
+
+USERNAME = "tomsmith"
+PASSWORD = "SuperSecretPassword!"
+
+try:
+    # Task 1: Start session
+    session = requests.Session()
+
+    # Load login page
+    login_page = session.get(LOGIN_URL)
+
+    if login_page.status_code != 200:
+        print("Failed to load login page.")
+    else:
+        # Task 2: Submit login form
+        login_data = {
+            "username": USERNAME,
+            "password": PASSWORD
+        }
+
+        response = session.post(POST_URL, data=login_data)
+
+        if response.status_code != 200:
+            print("Login failed.")
+        else:
+            # Task 3: Parse HTML and extract welcome message
+            soup = BeautifulSoup(response.text, "html.parser")
+            flash_message = soup.find(id="flash")
+
+            if flash_message:
+                message = flash_message.get_text(strip=True)
+
+                if "You logged into a secure area!" in message:
+                    clean_message = message.replace("×", "").strip()
+                    print(f"Welcome message: {clean_message}")
+                else:
+                    print("Login failed.")
+            else:
+                print("Login failed.")
+
+except requests.exceptions.RequestException:
+    print("Login failed.")
